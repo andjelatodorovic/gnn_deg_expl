@@ -2,7 +2,13 @@ from typing import List, Optional, Union
 
 from torch_geometric.data import Data, HeteroData
 
-from torch_geometric.data.datapipes import functional_transform
+try:
+    from torch_geometric.data.datapipes import functional_transform
+except ModuleNotFoundError:
+    def functional_transform(name):
+        def decorator(cls):
+            return cls
+        return decorator
 from torch_geometric.transforms import BaseTransform
 
 

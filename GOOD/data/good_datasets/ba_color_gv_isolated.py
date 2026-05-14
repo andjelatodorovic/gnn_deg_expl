@@ -4,7 +4,7 @@ import random
 import torch
 from munch import Munch
 from torch_geometric.data import InMemoryDataset, Data
-from torch_geometric.utils import from_networkx, shuffle_node, barabasi_albert_graph, erdos_renyi_graph, degree
+from torch_geometric.utils import from_networkx, barabasi_albert_graph, erdos_renyi_graph, degree
 
 from sklearn.model_selection import train_test_split
 

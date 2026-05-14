@@ -300,10 +300,8 @@ class GINEConv(gnn.MessagePassing):
         #     in_channels = self.nn[0].in_channels
         # self.bone_encoder = BondEncoder(in_channels, config)
         self.bone_encoder = bone_encoder
+        self._fixed_explain = False
         
-        if __pyg_version__ == "2.4.0":
-            print("#D#Using the fixed _explain_ functionality")
-            self._fixed_explain = False
 
         self.lin = None
         self.reset_parameters()
@@ -413,9 +411,8 @@ class ACRConv(gnn.MessagePassing):
         assert combine_type in ["simple", "mlp"]
         assert readout_type in ["add", "mean", "max"]
 
-        if __pyg_version__ == "2.4.0":
-            print("#D#Using the fixed _explain_ functionality")
-            self._fixed_explain = False
+        
+        self._fixed_explain = False
 
         super(ACRConv, self).__init__(aggr=aggregate_type, **kwargs)
         print("Using ACRConv")

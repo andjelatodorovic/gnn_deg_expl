@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import torch
 from munch import Munch
 from torch_geometric.data import Data, InMemoryDataset, extract_zip
-from torch_geometric.utils import from_networkx, shuffle_node
+from torch_geometric.utils import from_networkx
 from torch_geometric.data.separate import separate
 
 from tqdm import tqdm

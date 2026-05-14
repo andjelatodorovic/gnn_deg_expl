@@ -18,7 +18,7 @@ from munch import Munch
 import torch_geometric
 from torch_geometric.loader import DataLoader
 from torch_geometric.data import Batch, Data, InMemoryDataset
-from torch_geometric.utils import to_networkx, from_networkx, to_undirected, sort_edge_index, shuffle_node, is_undirected, contains_self_loops, contains_isolated_nodes, coalesce, subgraph, k_hop_subgraph
+from torch_geometric.utils import to_networkx, from_networkx, to_undirected, sort_edge_index, is_undirected, contains_self_loops, contains_isolated_nodes, coalesce, subgraph, k_hop_subgraph
 from tqdm import tqdm
 import networkx as nx
 import matplotlib.pyplot as plt

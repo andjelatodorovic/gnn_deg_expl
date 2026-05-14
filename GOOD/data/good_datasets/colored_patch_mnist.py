@@ -13,7 +13,7 @@ import torch
 from munch import Munch
 from torch_geometric.data import InMemoryDataset, extract_zip, Data
 from torch_geometric.datasets import MNISTSuperpixels
-from torch_geometric.utils import from_networkx, shuffle_node
+from torch_geometric.utils import from_networkx
 from torch_geometric.utils import dense_to_sparse
 
 from tqdm import tqdm

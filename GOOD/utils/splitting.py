@@ -1,5 +1,17 @@
 import torch
-from torch_geometric.utils import degree, cumsum, scatter, softmax
+from torch_geometric.utils import degree, softmax
+
+try:
+    from torch_geometric.utils import scatter
+except ImportError:
+    from torch_scatter import scatter
+
+try:
+    from torch_geometric.utils import cumsum
+except ImportError:
+    def cumsum(x, dim=0):
+        size = x.size()[:dim] + (1,) + x.size()[dim + 1:]
+        return torch.cat([x.new_zeros(size), x.cumsum(dim=dim)], dim=dim)
 
 def split_graph(data, edge_score, ratio, debug=False, return_batch=False, compensate_edge_removal=None, is_weight=False):
     # if debug:

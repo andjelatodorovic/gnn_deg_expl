@@ -18,7 +18,6 @@ from GOOD.utils.config_reader import Union, CommonArgs, Munch
 from GOOD.utils.train import lift_node_att_to_edge_att
 
 from .BaseGNN import GNNBasic
-from .GINvirtualnode import vFeatExtractor
 from .GINs import FeatExtractor
 from .Classifiers import Classifier
 from torch_geometric.utils.loop import add_self_loops, remove_self_loops
