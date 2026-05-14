@@ -1,34 +1,3 @@
-"""
-walchen_experiments.py
-
-Run Wälchen verification on a trained GOOD / GSAT model.
-
-Place this file in the repo root:
-
-    C:/Users/Cerebria/gnn_deg_expl/walchen_experiments.py
-
-Required sibling file:
-
-    C:/Users/Cerebria/gnn_deg_expl/walchen_framework.py
-
-Example from VS Code terminal:
-
-    cd C:/Users/Cerebria/gnn_deg_expl
-    C:/Users/Cerebria/.virtualenv/Scripts/activate
-
-    python walchen_experiments.py `
-      --config_path final_configs/BAColorGVIsol/basis/no_shift/GSAT.yaml `
-      --seed 1 `
-      --pretrain degenerate `
-      --backbone ACR2 `
-      --split id_test `
-      --load_split id `
-      --device cpu `
-      --num-features 5 `
-      --limit-graphs 50 `
-      --output ./walchen_experiments/
-"""
-
 import argparse
 import json
 import os
@@ -40,9 +9,6 @@ import torch
 from torch_geometric.data import Batch, Data
 
 
-# ---------------------------------------------------------------------
-# Repo-root setup
-# ---------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parent
 
@@ -53,9 +19,6 @@ os.environ.setdefault("WANDB_MODE", "disabled")
 os.environ.setdefault("WANDB_DISABLED", "true")
 
 
-# ---------------------------------------------------------------------
-# Local imports
-# ---------------------------------------------------------------------
 
 from walchen_framework import WalchenFramework
 
@@ -66,12 +29,8 @@ from GOOD.ood_algorithms.ood_manager import load_ood_alg
 from GOOD.kernel.pipeline_manager import load_pipeline
 
 
-# ---------------------------------------------------------------------
-# JSON / tensor helpers
-# ---------------------------------------------------------------------
 
 def to_jsonable(obj: Any) -> Any:
-    """Convert tensors, numpy values and nested objects into JSON-safe values."""
     if isinstance(obj, torch.Tensor):
         obj = obj.detach().cpu()
         if obj.numel() == 1:
@@ -101,7 +60,6 @@ def to_jsonable(obj: Any) -> Any:
 
 
 def get_graph_label(graph: Data) -> torch.Tensor:
-    """Extract a single graph-level label from a PyG Data object."""
     y = graph.y
 
     if not isinstance(y, torch.Tensor):
@@ -120,7 +78,6 @@ def maybe_limit_graphs(
     labels: torch.Tensor,
     limit_graphs: Optional[int],
 ) -> Tuple[List[Data], torch.Tensor]:
-    """Optionally restrict verification to the first N graphs."""
     if limit_graphs is None or limit_graphs <= 0:
         return graphs, labels
 
@@ -128,28 +85,10 @@ def maybe_limit_graphs(
     return graphs[:limit], labels[:limit]
 
 
-# ---------------------------------------------------------------------
-# GOOD / GSAT adapter
-# ---------------------------------------------------------------------
 
 class GOODModelAdapter(torch.nn.Module):
     """
     Adapter around the trained GOOD / GSAT model.
-
-    The repo normally calls the model as:
-
-        model(
-            data=data,
-            edge_weight=None,
-            ood_algorithm=ood_algorithm,
-            ...
-        )
-
-    Wälchen is likely to expect something simpler like:
-
-        model(graphs)
-
-    This wrapper bridges that interface.
     """
 
     def __init__(self, model: torch.nn.Module, ood_algorithm: Any, config: Any):
@@ -160,7 +99,6 @@ class GOODModelAdapter(torch.nn.Module):
         self.device = config.device
 
     def _to_batch(self, graph_or_batch: Any) -> Batch:
-        """Convert Data, Batch or list[Data] into a PyG Batch."""
         if isinstance(graph_or_batch, list):
             data = Batch.from_data_list(graph_or_batch)
         elif isinstance(graph_or_batch, Data):
@@ -171,7 +109,6 @@ class GOODModelAdapter(torch.nn.Module):
         return data.to(self.device)
 
     def _raw_forward(self, graph_or_batch: Any) -> Any:
-        """Call the underlying GOOD model in the repo's expected style."""
         data = self._to_batch(graph_or_batch)
 
         self.model.eval()
@@ -211,7 +148,6 @@ class GOODModelAdapter(torch.nn.Module):
 
     @torch.no_grad()
     def predict(self, graph_or_batch: Any) -> torch.Tensor:
-        """Return hard class predictions."""
         output = self.forward(graph_or_batch)
 
         if output.ndim == 2 and output.size(-1) > 1:
@@ -221,7 +157,6 @@ class GOODModelAdapter(torch.nn.Module):
 
     @torch.no_grad()
     def predict_proba(self, graph_or_batch: Any) -> torch.Tensor:
-        """Return probabilities when possible."""
         output = self.forward(graph_or_batch)
 
         if output.ndim == 2 and output.size(-1) > 1:
@@ -231,12 +166,7 @@ class GOODModelAdapter(torch.nn.Module):
 
     @torch.no_grad()
     def get_subgraph(self, graph_or_batch: Any) -> Any:
-        """
-        Expose GSAT's subgraph/explanation method.
-
-        GSAT in this repo implements get_subgraph(...), returning:
-            edge_mask, attention, logits
-        """
+       
         data = self._to_batch(graph_or_batch)
 
         if not hasattr(self.model, "get_subgraph"):
@@ -252,9 +182,6 @@ class GOODModelAdapter(torch.nn.Module):
         )
 
 
-# ---------------------------------------------------------------------
-# GOOD / GSAT loading
-# ---------------------------------------------------------------------
 
 def build_good_args(
     config_path: str,
@@ -471,20 +398,10 @@ def sanity_check_loaded_model(
     labels: torch.Tensor,
     max_graphs: int = 8,
 ) -> None:
-    """
-    Check that loading worked before running Wälchen.
-
-    This verifies:
-      1. graphs exist
-      2. labels exist
-      3. the model forward pass works
-      4. outputs are finite
-      5. prediction count matches graph count
-    """
+  
 
     print("\n" + "=" * 60)
     print("SANITY CHECK")
-    print("=" * 60)
 
     if len(graphs) == 0:
         raise ValueError("No graphs loaded.")
@@ -553,8 +470,7 @@ def run_walchen_verification(
     num_features: int,
 ) -> Dict[str, Any]:
     print("\n" + "=" * 60)
-    print("RUNNING WÄLCHEN VERIFICATION")
-    print("=" * 60)
+    print("Running verification")
     print(f"Graphs:        {len(graphs)}")
     print(f"Labels:        {len(labels)}")
     print(f"Device:        {device}")
@@ -573,8 +489,7 @@ def run_walchen_verification(
 
 def print_results(results: Dict[str, Any], dataset_info: Dict[str, Any]) -> str:
     print("\n" + "=" * 60)
-    print("WÄLCHEN VERIFICATION RESULTS")
-    print("=" * 60)
+    print("VERIFICATION RESULTS")
     print(f"Model:   {dataset_info.get('resolved_model_name')}")
     print(f"Dataset: {dataset_info.get('resolved_dataset_name')}")
     print(f"Split:   {dataset_info.get('split')}")
@@ -593,7 +508,6 @@ def print_results(results: Dict[str, Any], dataset_info: Dict[str, Any]) -> str:
     print("  Higher is better.")
 
     print(f"\nAsymmetric Feature Corr kappa:{afc:.4f}")
-    print("  Measures feature bias in the dataset.")
 
     print(f"\nRelative Success Rate alpha:  {alpha:.4f}")
     print("  Measures Morgana attack effectiveness.")
