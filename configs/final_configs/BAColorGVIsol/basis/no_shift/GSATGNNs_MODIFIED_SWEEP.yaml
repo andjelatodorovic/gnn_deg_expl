@@ -1,0 +1,15 @@
+﻿includes:
+  - base.yaml
+model:
+  model_name: GSATGNNs_MODIFIED
+ood:
+  ood_alg: GSAT
+  ood_param: 0.0
+  extra_param:
+    - 5      # K
+    - 0.01    # epsilon
+    - 1       # game_iterations
+    - 0.01    # merlin_lr
+    - 1       # morgana_steps
+    - 0.01    # morgana_lr
+    - 1.0     # morgana_weightmitigation_sampling: default

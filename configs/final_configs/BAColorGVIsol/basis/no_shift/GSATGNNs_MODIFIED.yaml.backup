@@ -1,0 +1,21 @@
+includes:
+  - base.yaml
+model:
+  model_name: GSATGNNs_MODIFIED
+ood:
+  ood_alg: GSAT
+  ood_param: 0.1
+  extra_param:
+    - 50     # K: number of nodes to select
+    - 0.05   # epsilon: Morgana perturbation budget
+    - 5      # game_iterations: Merlin-Morgana rounds
+    - 0.01   # merlin_lr
+    - 5     # morgana_steps
+    - 0.01   # morgana_lr
+train:
+  mile_stones:
+    - 150
+log_file: exp_0
+clean_save: true
+use_norm: none
+mitigation_sampling: default

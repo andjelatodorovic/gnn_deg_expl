@@ -228,16 +228,6 @@ def process_configs(config: Union[CommonArgs, Munch], args=None):
     elif config.train.pretrain == "sub":
         model_dirname += f"_pretsub"
 
-    # Shorten checkpoint/model directory names on Windows.
-    model_dirname = (
-        model_dirname
-        .replace("_normnone", "")
-        .replace("_readnormnone", "")
-        .replace("avgedgeattnNone", "")
-        .replace("mitig_readoutweighted", "_mrw")
-        .replace("mitig_readoutNone", "")
-        .replace("mitig_samplingdefault", "")
-    )
     print("model_dirname=", model_dirname)
     
     train_dirname = f'{config.train.lr}lr_{config.train.weight_decay}wd'

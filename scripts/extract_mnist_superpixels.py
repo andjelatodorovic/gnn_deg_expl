@@ -21,7 +21,7 @@ def parse_args():
     parser.add_argument('-s', '--split', type=str, default='train', choices=['train', 'val', 'test'])
     parser.add_argument('-t', '--threads', type=int, default=0, help='number of parallel threads')
     parser.add_argument('-n', '--n_sp', type=int, default=75, help='max number of superpixels per image')
-    parser.add_argument('-c', '--compactness', type=int, default=0.25, help='compactness of the SLIC algorithm '
+    parser.add_argument('-c', '--compactness', type=float, default=0.25, help='compactness of the SLIC algorithm '
                                                                       '(Balances color proximity and space proximity): '
                                                                       '0.25 is a good value for MNIST '
                                                                       'and 10 for color images like CIFAR-10')

@@ -275,8 +275,7 @@ class Pipeline:
                     data=data,
                     edge_weight=None,
                     ood_algorithm=self.ood_algorithm,
-                    #max_num_epoch=self.config.train.max_epoch,
-                    max_num_epoch=200,
+                    max_num_epoch=self.config.train.max_epoch,
                     curr_epoch=epoch,
                     pretrain=False
                 )
@@ -356,8 +355,7 @@ class Pipeline:
                             data=data,
                             edge_weight=None,
                             ood_algorithm=self.ood_algorithm,
-                            #max_num_epoch=self.config.train.max_epoch,
-                            max_num_epoch=200,
+                            max_num_epoch=self.config.train.max_epoch,
                             curr_epoch=epoch,
                             pretrain=False
                         )
@@ -612,24 +610,20 @@ class Pipeline:
             ##
             for stat, split in zip([epoch_train_stat, id_val_stat], ["train", "valid"]):
                 all_att = torch.cat(stat["node_expl"]).view(-1)
-                node_gt = torch.cat(stat["node_gt"]) if "node_gt" in stat and len(stat["node_gt"]) > 0 else None
+                node_gt = torch.cat(stat["node_gt"])
                 bkg_att_weights = all_att[node_gt == 0]
                 signal_att_weights = all_att[node_gt == 1]
-                #bkg_att_weights = torch.cat((bkg_att_weights, torch.zeros((1))), dim=0)
-                bkg_att_weights = torch.cat((bkg_att_weights, torch.zeros_like(bkg_att_weights[:1])),dim=0)
-                #signal_att_weights = torch.cat((signal_att_weights, torch.zeros((1))), dim=0)
-                signal_att_weights = torch.cat((signal_att_weights, torch.zeros_like(signal_att_weights[:1])),dim=0)
+                bkg_att_weights = torch.cat((bkg_att_weights, torch.zeros((1))), dim=0)
+                signal_att_weights = torch.cat((signal_att_weights, torch.zeros((1))), dim=0)
                 def histogram_entropy(v, n_bins=10, base=2):
                     counts, _ = np.histogram(v, bins=n_bins, range=(0,1))
                     p = counts / counts.sum()
                     p = p[p > 0]
                     return -np.sum(p * np.log(p)) / np.log(base)  # convert log to desired base
                 self.writer.add_scalar(f'{split}_loss/{self.timestamp}', loss_per_batch_dict['total_loss'], epoch)
-                if bkg_att_weights.numel() > 0:
-                    self.writer.add_histogram(f'{split}_histogram/{self.timestamp}/bkg_att_weights',
+                self.writer.add_histogram(f'{split}_histogram/{self.timestamp}/bkg_att_weights',
                                         bkg_att_weights, epoch, bins=100)
-                if signal_att_weights.numel() > 0:
-                    self.writer.add_histogram(f'{split}_histogram/{self.timestamp}/signal_att_weights',
+                self.writer.add_histogram(f'{split}_histogram/{self.timestamp}/signal_att_weights',
                                         signal_att_weights, epoch, bins=100)
                 entropy_att_distrib = histogram_entropy(all_att, n_bins=100, base=2)
                 self.writer.add_scalar(f'{split}_H_E/{self.timestamp}', entropy_att_distrib, epoch)
@@ -747,7 +741,7 @@ class Pipeline:
         graphs_nx = {}
         for split in splits:
             dataset = self.get_local_dataset(split)
-            loader = DataLoader(dataset, batch_size=8, shuffle=False, num_workers=0)            
+            loader = DataLoader(dataset, batch_size=512, shuffle=False, num_workers=2)            
             for data in loader:
                 data: Batch = data.to(self.config.device)   
                 edge_scores, node_scores, logits = self.model.get_subgraph(
@@ -913,7 +907,8 @@ class Pipeline:
                 #     exit()
 
         if len(eval_samples) <= 1:
-            print(f"\nToo few intervened samples, skipping this metric")
+            print(f"\nToo few intervened samples, skipping this")
+            exit()
             scores["all_KL"].append(1.0)
             scores["all_L1"].append(1.0)
             scores["rejection"].append(np.nan)
@@ -1215,8 +1210,7 @@ class Pipeline:
 
             # --------------- TEMPORARY ONLY FOR THE IB ANALYSIS ------------------
             node_expl_all.append(model_output[2].cpu())
-            if hasattr(data, "node_is_spurious"):
-                node_gt_all.append(data.node_is_spurious.cpu())
+            node_gt_all.append(data.node_is_spurious.cpu())
 
             mask_all.append(mask)
             # loss_all.append(loss.item())

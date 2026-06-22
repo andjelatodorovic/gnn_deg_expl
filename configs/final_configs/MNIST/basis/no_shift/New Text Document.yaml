@@ -1,0 +1,47 @@
+includes:
+  - ../base.yaml
+
+model:
+  model_name: GSATGNNs_MODIFIED
+  backbone: ACR2
+  model_layer: 2
+  gnn_clf_layer: 2
+  global_pool: sum
+  dim_hidden: 300
+  dim_ffn: 100
+  dropout_rate: 0.0
+
+ood:
+  ood_alg: GSAT
+  ood_param: 0.0
+  extra_param:
+    - 0.15
+    - 0.01
+    - 1
+    - 0.001
+    - 1
+    - 0.001
+    - 0.1
+
+train:
+  num_steps: 10
+  mile_stones:
+    - 20
+  max_epoch: 20
+  train_bs: 256
+  val_bs: 512
+  test_bs: 512
+  lr: 0.001
+  weight_decay: 0.0
+
+dataset:
+  dataset_name: MNIST
+  domain: basis
+  shift_type: no_shift
+  generate: false
+
+use_norm: none
+average_edge_attn: mean
+mitigation_sampling: raw
+mitigation_readout: weighted
+log_file: exp_0

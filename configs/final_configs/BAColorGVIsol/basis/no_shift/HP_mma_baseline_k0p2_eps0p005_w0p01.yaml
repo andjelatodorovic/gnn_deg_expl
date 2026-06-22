@@ -1,0 +1,27 @@
+includes:
+  - base.yaml
+
+model:
+  model_name: GSATGNNs_MODIFIED
+
+ood:
+  ood_alg: GSAT
+  ood_param: 1.0
+  extra_param:
+    - 0.2
+    - 0.005
+    - 1
+    - 0.0005
+    - 2
+    - 0.0002
+    - 0.01
+
+train:
+  max_epoch: 30
+  mile_stones:
+    - 20
+
+log_file: HP_mma_baseline_k0p2_eps0p005_w0p01
+clean_save: true
+use_norm: none
+mitigation_sampling: default

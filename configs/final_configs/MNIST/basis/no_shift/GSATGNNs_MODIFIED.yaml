@@ -1,0 +1,49 @@
+includes:
+  - ../base.yaml
+
+model:
+  model_name: GSATGNNs_MODIFIED
+  backbone: ACR2
+  model_layer: 2
+  gnn_clf_layer: 2
+  global_pool: sum
+  dim_hidden: 300
+  dim_ffn: 100
+  dropout_rate: 0.0
+
+ood:
+  ood_alg: GSAT
+  ood_param: 1.0
+  extra_param:
+    - 0.2        # K
+    - 0.005     # epsilon
+    - 2         # game_iterations
+    - 0.0005    # merlin_lr
+    - 2         # morgana_steps
+    - 0.0002    # morgana_lr
+    - 0.01      # morgana_weight
+
+train:
+  num_steps: 10
+  mile_stones:
+    - 20
+  max_epoch: 20
+  train_bs: 256
+  val_bs: 512
+  test_bs: 512
+  lr: 0.0001
+  weight_decay: 0.0
+
+dataset:
+  dataset_name: MNIST
+  domain: basis
+  shift_type: no_shift
+  shift: no_shift
+  generate: false
+
+use_norm: none
+use_readout_norm: none
+average_edge_attn: mean
+mitigation_sampling: raw
+mitigation_readout: weighted
+log_file: exp_0

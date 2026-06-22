@@ -747,7 +747,7 @@ class Pipeline:
         graphs_nx = {}
         for split in splits:
             dataset = self.get_local_dataset(split)
-            loader = DataLoader(dataset, batch_size=8, shuffle=False, num_workers=0)            
+            loader = DataLoader(dataset, batch_size=512, shuffle=False, num_workers=2)            
             for data in loader:
                 data: Batch = data.to(self.config.device)   
                 edge_scores, node_scores, logits = self.model.get_subgraph(

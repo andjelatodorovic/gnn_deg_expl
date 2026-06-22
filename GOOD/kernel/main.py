@@ -162,7 +162,11 @@ def main():
         for s in test_auroc.keys():
             print(f"{s.upper():<10} = {np.mean(test_auroc[s]):.3f} +- {np.std(test_auroc[s]):.3f}")
 
-    if not np.isnan(test_f1_pos["train"][0]):
+    if (
+        "train" in test_f1_pos
+        and len(test_f1_pos["train"]) > 0
+        and not np.isnan(test_f1_pos["train"][0])
+    ):
         print("\n\nFinal F1_pos: ")
         for s in test_f1_pos.keys():
             print(f"{s.upper():<10} = {np.mean(test_f1_pos[s]):.3f} +- {np.std(test_f1_pos[s]):.3f}")

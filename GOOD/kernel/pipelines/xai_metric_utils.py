@@ -7,7 +7,13 @@ import numpy as np
 import os
 
 from torch_geometric.data import Data
-from torch_geometric.utils import remove_isolated_nodes, dropout_edge, to_networkx, subgraph
+from torch_geometric.utils import remove_isolated_nodes, to_networkx, subgraph
+
+try:
+    from torch_geometric.utils import dropout_edge
+except ImportError:
+    from torch_geometric.utils import dropout_adj as dropout_edge
+
 from torch_scatter import scatter_sum, scatter_add
 
 from GOOD.utils.splitting import split_graph

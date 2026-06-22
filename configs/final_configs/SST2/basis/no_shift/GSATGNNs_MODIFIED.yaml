@@ -1,0 +1,21 @@
+includes:
+  - base.yaml
+
+model:
+  model_name: GSATGNNs_MODIFIED
+
+ood:
+  ood_alg: GSAT
+  ood_param: 1.0
+  extra_param:
+    - 10       # K: Merlin keeps top-10 nodes/tokens
+    - 0.01     # epsilon for Morgana perturbation
+    - 1        # game_iterations
+    - 0.001    # merlin_lr
+    - 1        # morgana_steps
+    - 0.001    # morgana_lr
+    - 0.1      # morgana_weight
+
+log_file: exp_0
+use_readout_norm: none
+mitigation_sampling: default

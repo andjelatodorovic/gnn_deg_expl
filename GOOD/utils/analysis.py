@@ -793,7 +793,9 @@ def evaluate_metric(args):
         model, loader = initialize_model_dataset(config)
         ood_algorithm = load_ood_alg(config.ood.ood_alg, config)
         pipeline = load_pipeline(config.pipeline, config.task, model, loader, ood_algorithm, config)
+        print("DEBUG BEFORE load_task")
         pipeline.load_task(load_param=True, load_split="id")
+        print("DEBUG AFTER load_task")
         
         ##
         # GENERATE BINARY EXPLANATION MASKS
@@ -803,7 +805,11 @@ def evaluate_metric(args):
             thrs=thrs,
             splits=splits,
             convert_to_nx="interven_suff" in args.metrics,
-            is_node_expl=not config.ood.extra_param[0] # is the learn_edge_att parameter
+            is_node_expl=(
+                True
+                if config.model.model_name == "GSATGNNs_MODIFIED"
+                else not config.ood.extra_param[0]
+            ) # GSATGNNs_MODIFIED returns node explanations
         )            
 
         for metric in args.metrics.split("/"):

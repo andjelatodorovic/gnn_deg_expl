@@ -1,0 +1,98 @@
+Metadata-Version: 2.4
+Name: graph-ood
+Version: 1.0.1
+Summary: LECI
+Home-page: https://github.com/divelab/LECI
+Author: Shurui Gui
+Author-email: shurui.gui@tamu.edu
+License: GPLv3
+Project-URL: Bug Tracker, https://github.com/divelab/LECI/issues
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: cilog==1.2.3
+Requires-Dist: gdown>=4.4.0
+Requires-Dist: matplotlib==3.5.2
+Requires-Dist: munch==2.5.0
+Requires-Dist: networkx==2.8
+Requires-Dist: ogb>=1.3.4
+Requires-Dist: pytest==7.1.2
+Requires-Dist: pytest-cov~=3.0
+Requires-Dist: pytest-xdist~=2.5
+Requires-Dist: ruamel.yaml==0.17.21
+Requires-Dist: sphinx>=4.5
+Requires-Dist: protobuf==3.20.1
+Requires-Dist: sphinx-rtd-theme==1.0.0
+Requires-Dist: tensorboard==2.8.0
+Requires-Dist: tqdm==4.64.0
+Requires-Dist: typed-argument-parser==1.7.2
+Requires-Dist: dive-into-graphs
+Requires-Dist: cvxopt>=1.3.0
+Requires-Dist: pynvml>=11.4.1
+Requires-Dist: psutil>=5.9.1
+Requires-Dist: numpy~=1.21.5
+Requires-Dist: setuptools~=59.5.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# GNN Explanations that do not Explain and How to find Them
+
+Official repo for the ICLR 2026 paper [*GNN Explanations that do not Explain and How to find Them*](https://arxiv.org/pdf/2601.20815).
+
+⚠️This repo is still under maintainance. Do not esistate to write to the corresponding author for any inquiry⚠️
+
+## Installation
+
+Regarding the installation of the library -- which is required in order to run the code with the `goodtg` functionality -- please refer to [GOOD](https://github.com/divelab/GOOD) or to our previous [project](https://github.com/steveazzolin/beyond-topo-segnns/).
+
+## Model Implementations
+
+Models implementation can be found here `GOOD\networks\models`.
+Basic implementations of classifiers and shared modules are available in `GOOD\networks\models\Classifiers.py`.
+
+## Training Details
+
+The file `GOOD\ood_algorithms\algorithms\BaseOOD.py` contains the basic training logic for each model. Then, for specific training protocols of each architecture, please refer to the corresponding file in the same folder. Note that configurations of additional models not tested in this work may be present, as they are inhereted from the original GOOD implementation.
+
+In this work, the following models are considered:
+ - GIN (ERM - Empirical Risk Minimization)
+ - GSAT
+ - DIR
+ - SMGNN
+
+## Configurations files
+
+Configuration files and hyper-parameter details for each experiment are available in `configs/final_configs/`.
+
+## Datasets
+
+Dataset implementations are provided in `GOOD\data\good_datasets`.
+
+For generating MNIST75sp the MNIST dataset, please refer to the [original paper](https://github.com/bknyaz/graph_attention_pool/tree/master/scripts). We included in our codebase the file `scripts\extract_mnist_superpixels.py` for ease of reproduction.
+
+## Checkpoints
+
+Checkpoints will be made available soon.
+
+## Experiments
+
+Please refer to `scripts\eval.sh` for examples of how to run the code for each model and dataset.
+
+The `--task` argument regulates the behaviour of the code, and can be set as follows:
+
+- `test`: Evaluate the model
+- `train`: Train the model
+- `plot_explanations`: Plot examples of explanations
+- `eval_metric`: Evaluate a faithfulness metric. The metric to test has to be specified in the `metrics` argument (e.g. `--metrics rfidm/rfidp/suff_cause/suff/nec/counter_fid`). See `scripts\faithfulness_ablation_expval_budget.sh` for an example.
