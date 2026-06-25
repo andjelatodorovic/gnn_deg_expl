@@ -8,13 +8,13 @@ ood:
   ood_alg: GSAT
   ood_param: 1.0
   extra_param:
-    - 0.2        # K
-    - 0.005     # epsilon
-    - 2         # game_iterations
-    - 0.001    # merlin_lr
-    - 2         # morgana_steps
-    - 0.0001    # morgana_lr
-    - 0.1      # morgana_weight
+    - 0.3        # K — 40% of nodes per graph
+    - 0.03        # epsilon — mask space is [0,1] so 0.3 is a meaningful budget
+    - 1          # game_iterations
+    - 0.005       # merlin_lr — higher now justified: fewer steps, full GNN per step
+    - 3         # morgana_steps — reduce from 20; full GNN per step is expensive
+    - 0.001       # morgana_lr — epsilon/steps = 0.3/10
+    - 0.02        # morgana_weight — start lower; soundness in mask space is stronger signal
 
 train:
   mile_stones:

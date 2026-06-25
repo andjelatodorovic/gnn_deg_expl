@@ -149,8 +149,33 @@ class BaseOODAlg(ABC):
             processed loss
 
         """
+        
+        # Arthur learns to classify Merlin's selected subgraph correctly -> clf loss
         self.mean_loss = loss.sum() / mask.sum()
-        return self.mean_loss
+
+        model = self.model
+
+        # unwrap common wrappers
+        while hasattr(model, "module"):
+            model = model.module
+
+        morgana_loss = getattr(model, "morgana_loss", None)
+        if morgana_loss is None:
+            self.spec_loss = loss.new_tensor(0.0)
+        else:
+            self.spec_loss = morgana_loss
+
+        morgana_weight = getattr(model, "morgana_weight", None)
+
+        if morgana_weight is None:
+            ep = getattr(config.ood, "extra_param", [])
+            morgana_weight = ep[-1] if len(ep) > 0 else 0.1
+
+        morgana_weight = float(morgana_weight)
+
+        self.total_loss = self.mean_loss + morgana_weight * self.spec_loss
+        return self.total_loss
+        #return self.mean_loss
 
     def set_up(self, model: torch.nn.Module, config: Union[CommonArgs, Munch]):
         r"""

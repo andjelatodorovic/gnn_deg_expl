@@ -487,9 +487,9 @@ class Pipeline:
             'clf_loss': self.ood_algorithm.clf_loss,
             'l_norm_loss': float(self.ood_algorithm.l_norm_loss),
             'entr_loss': float(self.ood_algorithm.entr_loss),
-            'spec_loss': float(0.0 if self.config.model.model_name == "GSATGNNs_MODIFIED" else self.ood_algorithm.spec_loss),
+            'spec_loss': float(self.ood_algorithm.spec_loss),
             'mean_loss': float(self.ood_algorithm.mean_loss),
-            'total_loss': float(self.ood_algorithm.mean_loss if self.config.model.model_name == "GSATGNNs_MODIFIED" else self.ood_algorithm.total_loss),
+            'total_loss': float(self.ood_algorithm.total_loss),
         }
 
 
@@ -591,11 +591,7 @@ class Pipeline:
             print(f"Clf loss: {loss_per_batch_dict['clf_loss']:.4f}")
             print(f"Spec loss: {loss_per_batch_dict['spec_loss']:.4f}")
             print(f"Mean loss: {loss_per_batch_dict['mean_loss']:.4f}")
-            if self.config.model.model_name == "GSATGNNs_MODIFIED":
-                loss_per_batch_dict['spec_loss'] = 0.0
-                loss_per_batch_dict['total_loss'] = loss_per_batch_dict.get('clf_loss', loss_per_batch_dict.get('mean_loss', 0.0))
-                loss_per_batch_dict['mean_loss'] = loss_per_batch_dict.get('clf_loss', loss_per_batch_dict.get('mean_loss', 0.0))
-
+            
             print(f"Total loss: {loss_per_batch_dict['total_loss']:.4f}")
 
             epoch_train_stat = self.evaluate(
@@ -1338,7 +1334,7 @@ class Pipeline:
 
         print(
             f'{split.capitalize()} {self.config.metric.score_name}: {stat["score"]:.4f} \t' + 
-            f'{split.capitalize()} Loss: {(loss_per_batch_dict["clf_loss"] if self.config.model.model_name == "GSATGNNs_MODIFIED" else loss_per_batch_dict["total_loss"]):.4f} \t' + 
+            f'{split.capitalize()} Loss: {loss_per_batch_dict["total_loss"]:.4f} \t' +
             (f'{split.capitalize()} WIoU: {stat["wiou"]:.3f} \t' if compute_plaus else '') +
             (f'{split.capitalize()} AUCROC: {stat["aucroc"]:.3f} \t' if compute_plaus else '') +
             (f'{split.capitalize()} F1_pos: {stat["f1_pos"]:.3f} \t' if compute_mcc else '') +
@@ -1350,11 +1346,7 @@ class Pipeline:
 
         return {
             'score': stat['score'],
-            'loss': (
-                loss_per_batch_dict['clf_loss']
-                if self.config.model.model_name == "GSATGNNs_MODIFIED"
-                else loss_per_batch_dict['total_loss']
-            ),
+            'loss': loss_per_batch_dict['total_loss'],
             'loss_dict': loss_per_batch_dict,
             'likelihood_avg': stat['likelihood_avg'],
             'likelihood_prod': stat['likelihood_prod'],

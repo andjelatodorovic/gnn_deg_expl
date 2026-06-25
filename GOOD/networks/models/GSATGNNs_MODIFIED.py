@@ -134,6 +134,8 @@ class MerlinExtractor(nn.Module):
             masked_emb = embeddings * m_soft.unsqueeze(1)
             logits = classifier_fn(masked_emb, edge_index, batch)
             loss = _graph_loss(logits, target) + self.sparsity_lambda * m_soft.mean()
+           
+
             loss.backward()
             optimizer.step()
 
@@ -293,7 +295,7 @@ class GSATGNNs_MODIFIED(GNNBasic):
 
         # Read hyperparameters from config
         ep = config.ood.extra_param
-        K                = ep[0] if len(ep) > 0 else 10
+        K                = ep[0] if len(ep) > 0 else 0.3
         epsilon          = ep[1] if len(ep) > 1 else 0.05
         game_iterations  = ep[2] if len(ep) > 2 else 1
         merlin_lr        = ep[3] if len(ep) > 3 else 0.01
@@ -302,12 +304,31 @@ class GSATGNNs_MODIFIED(GNNBasic):
         self.morgana_weight = float(ep[6]) if len(ep) > 6 else 1.0
         self.game_iterations = int(game_iterations)
 
+
+
+        print(f"[MMA raw extra_param] {config.ood.extra_param}")
+
+        print(
+            f"[MMA parsed params] "
+            f"K={K}, epsilon={epsilon}, "
+            f"game_iterations={self.game_iterations}, "
+            f"merlin_lr={merlin_lr}, "
+            f"morgana_steps={morgana_steps}, "
+            f"morgana_lr={morgana_lr}, "
+            f"morgana_weight={self.morgana_weight}"
+        )
+
+        assert self.game_iterations >= 1, f"game_iterations must be >=1, got {self.game_iterations}"
+        assert morgana_steps >= 1, f"morgana_steps must be >=1, got {morgana_steps}"
+        assert float(epsilon) > 0, f"epsilon must be >0, got {epsilon}"
+        assert float(self.morgana_weight) >= 0, f"morgana_weight must be >=0, got {self.morgana_weight}"
+
         # --- Merlin: honest prover ---
         self.merlin = MerlinExtractor(
             K=K,
             merlin_lr=merlin_lr,
-            merlin_steps=10,
-            sparsity_lambda=0.1,
+            merlin_steps=100,
+            sparsity_lambda=0.05,
         )
 
         # --- Morgana: adversarial prover ---

@@ -95,37 +95,26 @@ class GSAT(BaseOODAlg):
                      (1 - att) * torch.log((1 - att) / (1 - r + eps) + eps)).mean()
         self.spec_loss = config.ood.ood_param * info_loss
 
-        # TESTING new GSAT spec_loss
-        # _, att = to_undirected(data.edge_index, att.squeeze(-1), reduce="mean")
-        # attn_norm_per_batch = scatter_softmax(att.squeeze(1), data.batch[data.edge_index[0]])
-        # logattn = torch.log(attn_norm_per_batch + eps)
-        # info_loss = scatter_sum(-attn_norm_per_batch * logattn, data.batch[data.edge_index[0]]).mean()
-
-        # if self.model.entropy_reg:
-        #   exit("disable")
-        #   attn = att.squeeze(1)
-        #   self.entr_loss = self.config.train.entr_coeff * torch.mean(-attn * torch.log(attn + 1e-6) - (1 - attn) * torch.log(1 - attn + 1e-6))  
-        #   self.spec_loss += self.entr_loss
-
-        #   if torch.all(torch.isnan(self.entr_loss)):
-        #     print("ECCO2")
-
-        # TESTING L1 sparsification (optionally + Entropy regularization as in GiSST)
-        # self.l_norm_loss = self.config.train.l_norm_coeff * att.squeeze(1).abs().mean(-1) # L1
-        # # self.l_norm_loss = att.squeeze(1).pow(2).mean(-1) # L2        
-        # attn = att.squeeze(1)
-        # self.entr_loss = self.config.train.entr_coeff * torch.mean(-attn * torch.log(attn + 1e-6) - (1 - attn) * torch.log(1 - attn + 1e-6))
-        # info_loss = self.l_norm_loss + self.entr_loss
-
         self.mean_loss = loss.mean()
 
-        # if epoch < 5: # pre-train phase
-        #     self.spec_loss = torch.tensor(0.)
-        # else:
-        #     self.spec_loss = config.ood.ood_param * info_loss
+        if config.model.model_name == "GSATGNNs_MODIFIED":
+            model = self.model
+            while hasattr(model, "module"):
+                model = model.module
+
+            morgana_loss = getattr(model, "morgana_loss", None)
+            if morgana_loss is not None:
+                self.spec_loss = morgana_loss
+
+            morgana_weight = float(getattr(model, "morgana_weight", config.ood.extra_param[-1]))
+
+            self.total_loss = self.mean_loss + morgana_weight * self.spec_loss
+            return self.total_loss
 
         self.total_loss = self.mean_loss + self.spec_loss
         return self.total_loss
+
+
 
     def get_r(self, decay_interval, decay_r, current_epoch, init_r=0.9, final_r=0.5):
         r = init_r - current_epoch // decay_interval * decay_r

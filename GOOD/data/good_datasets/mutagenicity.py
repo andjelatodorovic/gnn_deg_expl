@@ -86,7 +86,7 @@ class MUTAG(InMemoryDataset):
         meta_info.dataset_type = 'syn'
         meta_info.model_level = 'graph'
 
-        dataset = Mutagenicity(dataset_root + "/Mutagenicity/")
+        dataset = Mutagenicity(dataset_root + "\\Mutagenicity/")
 
         if "DIR" in model_name:
             dataset._data.y = dataset._data.y.squeeze(-1).long()
@@ -191,7 +191,7 @@ class Mutagenicity(InMemoryDataset):
         return ['data.pt']
 
     def process(self):
-        with open(self.raw_dir + '/Mutagenicity.pkl', 'rb') as fin:
+        with open(self.raw_dir + '\\Mutagenicity.pkl', 'rb') as fin:
             _, original_features, original_labels = pkl.load(fin)
 
         edge_lists, graph_labels, edge_label_lists, node_type_lists = self.get_graph_data()
@@ -233,7 +233,7 @@ class Mutagenicity(InMemoryDataset):
         torch.save((data, slices), self.processed_paths[0])
 
     def get_graph_data(self):
-        pri = self.raw_dir + '/Mutagenicity_'
+        pri = self.raw_dir + '\\Mutagenicity_'
 
         file_edges = pri + 'A.txt'
         # file_edge_labels = pri + 'edge_labels.txt'
