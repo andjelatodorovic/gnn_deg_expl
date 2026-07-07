@@ -101,6 +101,10 @@ class MUTAG(InMemoryDataset):
         index_val = idx[n_train:n_train+n_valid]
         index_test = idx[n_train+n_valid:]
 
+        index_train = torch.as_tensor(index_train, dtype=torch.long)
+        index_val = torch.as_tensor(index_val, dtype=torch.long)
+        index_test = torch.as_tensor(index_test, dtype=torch.long)
+
         train_dataset = dataset[index_train]
         id_val_dataset = dataset[index_val]
         id_test_dataset = dataset[index_test]

@@ -11,3 +11,4 @@ __all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__
 
 from . import GSATGNNs
 from .GSATGNNs_MODIFIED import GSATGNNs_MODIFIED
+from . import SMGNN

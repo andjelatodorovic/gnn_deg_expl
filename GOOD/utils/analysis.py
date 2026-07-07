@@ -771,7 +771,7 @@ def evaluate_metric(args):
     if args.ratios != "":
         thrs = [float(r) for r in args.ratios.split("/")]
     else:
-        thrs = [0.5]
+        thrs = [0.1]
     print("Using thresholds = ", thrs)
     
     startTime = datetime.now()

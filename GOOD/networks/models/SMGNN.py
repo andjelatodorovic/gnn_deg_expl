@@ -14,7 +14,6 @@ from GOOD.utils.config_reader import Union, CommonArgs, Munch
 from .BaseGNN import GNNBasic
 from .Classifiers import Classifier
 from .GINs import FeatExtractor
-from .GINvirtualnode import vFeatExtractor
 import copy
 from GOOD.utils.splitting import split_graph, relabel
 from GOOD.utils.train import lift_node_att_to_edge_att
